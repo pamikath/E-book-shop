@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeafBook - Standalone Preview</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- React & Babel CDN for zero-setup preview -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            leaf: {
+              primary: '#186438',
+              hover: '#13522d',
+              soft: '#eef8f2',
+            }
+          },
+          fontFamily: {
+            sans: ['Prompt', 'Sarabun', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #fbfdfc; }
+    .book-shadow { box-shadow: -4px 6px 16px -2px rgba(0,0,0,0.25); }
+  </style>
+</head>
+<body class="text-slate-800 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const BOOKS = [
+      {
+        id: 'book-1',
+        title: 'The Mountain Within',
+        thaiTitle: 'พลังใจในวันที่ภูเขากลืนกิน',
+        author: 'Alex Rivera',
+        price: 199,
+        originalPrice: 250,
+        type: 'mountain',
+        pages: 280,
+        category: 'จิตวิทยา / พัฒนาตนเอง'
+      },
+      {
+        id: 'book-2',
+        title: 'Atomic Habits',
+        thaiTitle: 'นิสัยเล็กๆ ที่เปลี่ยนชีวิตได้',
+        author: 'James Clear',
+        price: 259,
+        originalPrice: 290,
+        type: 'atomic',
+        pages: 320,
+        category: 'พัฒนาตนเอง'
+      },
+      {
+        id: 'book-3',
+        title: 'ดวงดาวในคืนที่มืดที่สุด',
+        thaiTitle: 'ดวงดาวในคืนที่มืดที่สุด',
+        author: 'พราวประกายดาว',
+        price: 219,
+        originalPrice: 260,
+        type: 'stars',
+        pages: 240,
+        category: 'วรรณกรรม / แรงบันดาลใจ'
+      },
+      {
+        id: 'book-5',
+        title: 'TASK MANAGER PRO',
+        thaiTitle: 'TASK MANAGER PRO: คู่มือนักพัฒนา',
+        author: 'Developer Guide Team',
+        price: 289,
+        originalPrice: 350,
+        type: 'taskmanager',
+        pages: 10,
+        category: 'คอมพิวเตอร์ / พัฒนาโปรแกรม'
+      },
+      {
+        id: 'book-6',
+        title: 'MEDIA PLAYER PRO',
+        thaiTitle: 'MEDIA PLAYER PRO: คู่มือพัฒนาสถาปัตยกรรม',
+        author: 'AudioTech Labs',
+        price: 279,
+        originalPrice: 320,
+        type: 'mediaplayer',
+        pages: 9,
+        category: 'คอมพิวเตอร์ / มัลติมีเดีย'
+      },
+      {
+        id: 'book-7',
+        title: 'TAROT APP',
+        thaiTitle: 'TAROT APP: Developer Guide',
+        author: 'Mystic Software Studio',
+        price: 239,
+        originalPrice: 280,
+        type: 'tarot',
+        pages: 8,
+        category: 'คอมพิวเตอร์ / ไลฟ์สไตล์'
+      }
+    ];
+
+    function BookCover({ type, title, author, size = "md" }) {
+      if (type === 'taskmanager') {
+        return (
+          <div className="w-full aspect-[3/4] max-h-52 bg-[#fbf9f4] border border-[#e4decb] rounded-md p-3 text-[#2d2926] flex flex-col justify-between items-center relative overflow-hidden book-shadow">
+            <div className="text-[8px] text-[#8a7f6c]">◈ ✧ ◈</div>
+            <div className="text-center my-auto">
+              <div className="font-serif font-black text-xs uppercase">TASK MANAGER</div>
+              <div className="font-serif font-black text-[11px] text-[#5c5344]">PRO</div>
+              <div className="text-[7.5px] text-[#6b6252] mt-1">คู่มือนักพัฒนาและซอร์สโค้ด</div>
+            </div>
+            <div className="px-2 py-0.5 border border-[#b8ae9c] text-[7px] text-[#5c5344] uppercase font-mono bg-[#f3ede0]">DEVELOPER GUIDE</div>
+          </div>
+        );
+      }
+      if (type === 'mediaplayer') {
+        return (
+          <div className="w-full aspect-[3/4] max-h-52 bg-[#141414] border border-neutral-800 rounded-md p-3 text-white flex flex-col justify-between items-center relative overflow-hidden book-shadow">
+            <div className="text-[#f05d5e] text-xs">❦</div>
+            <div className="text-center my-auto space-y-1">
+              <div className="font-sans font-black text-xs text-[#f05d5e]">MEDIA PLAYER PRO</div>
+              <div className="text-[7.5px] text-neutral-300">คู่มือการพัฒนาและสถาปัตยกรรม</div>
+              <div className="text-[7px] text-neutral-400">ฉบับปรับปรุง • กันยายน 2026</div>
+            </div>
+            <div className="text-[#f05d5e] text-xs">❦</div>
+          </div>
+        );
+      }
+      if (type === 'tarot') {
+        return (
+          <div className="w-full aspect-[3/4] max-h-52 bg-[#1a1412] border border-neutral-800 rounded-md p-3 text-white flex flex-col justify-between items-center relative overflow-hidden book-shadow">
+            <div className="w-full flex-1 border border-[#cba358]/80 rounded p-2 flex flex-col items-center justify-center my-auto">
+              <div className="font-serif font-bold text-xs tracking-wider text-[#dfba6e] uppercase">TAROT APP</div>
+              <div className="text-[7.5px] text-[#b89b65] italic mt-1">Developer Guide</div>
+            </div>
+            <div className="text-[7px] text-[#8c744c] uppercase tracking-widest mt-1">Python PyQt6</div>
+          </div>
+        );
+      }
+      if (type === 'mountain') {
+        return (
+          <div className="w-full aspect-[3/4] max-h-52 bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#022c22] rounded-md p-3 text-white flex flex-col justify-between relative overflow-hidden book-shadow">
+            <div className="text-center font-serif text-xs uppercase tracking-wider font-semibold">The Mountain<br/><span className="text-emerald-300">Within</span></div>
+            <div className="text-center text-[9px] text-emerald-200">{author}</div>
+          </div>
+        );
+      }
+      if (type === 'atomic') {
+        return (
+          <div className="w-full aspect-[3/4] max-h-52 bg-[#f7f4eb] border border-stone-200 rounded-md p-3 text-stone-800 flex flex-col items-center justify-between relative overflow-hidden book-shadow">
+            <div className="text-[7px] text-stone-400 uppercase tracking-widest">Bestseller</div>
+            <div className="text-center font-serif font-bold text-base leading-tight">Atomic<br/><span className="text-[#8c6d3b]">Habits</span></div>
+            <div className="w-8 h-10 text-emerald-700 my-auto">
+              <svg viewBox="0 0 40 50" fill="currentColor"><path d="M20 40 Q20 20 20 10 C10 12 10 25 20 30 Z"/><path d="M20 40 Q20 20 20 10 C30 12 30 25 20 30 Z" fill="#2d683f"/></svg>
+            </div>
+            <div className="text-[8px] text-stone-600">{author}</div>
+          </div>
+        );
+      }
+      return (
+        <div className="w-full aspect-[3/4] max-h-52 bg-gradient-to-b from-[#090a1a] via-[#101438] to-[#1e1435] rounded-md p-3 text-white flex flex-col justify-between relative overflow-hidden book-shadow">
+          <div className="text-center font-sans text-xs font-semibold text-cyan-100">ดวงดาว<br/><span className="text-amber-200 text-[10px]">ในคืนที่มืดที่สุด</span></div>
+          <div className="text-center text-[9px] text-purple-200">{author}</div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [screen, setScreen] = useState('1'); // '1' to '9'
+      const [cart, setCart] = useState([{ book: BOOKS[1], qty: 1 }]);
+      const [order, setOrder] = useState({ id: 'ORD2026001', date: '10 ก.ย. 2026 14:32', total: 259 });
+
+      const cartTotal = cart.reduce((sum, item) => sum + item.book.price * item.qty, 0);
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Top Sticky Large DEMO ONLY Banner */}
+          <div className="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 border-b-2 border-amber-500 text-amber-950 px-3 py-2 text-center sticky top-0 z-40 select-none shadow-sm">
+            <div className="max-w-4xl mx-auto flex items-center justify-center gap-2 flex-wrap text-center">
+              <span className="bg-amber-950 text-amber-300 px-2.5 py-0.5 rounded text-xs sm:text-sm font-black uppercase tracking-wider">
+                ⚠️ DEMO ONLY
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-amber-950">
+                ระบบจำลองเพื่อการศึกษาเท่านั้น • ห้ามรับหรือโอนเงินจริง (Mock Payment Only)
+              </span>
+            </div>
+          </div>
+
+          {/* Top Bar */}
+          <header className="bg-white border-b border-gray-100 sticky top-9 z-30 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setScreen('1')}>
+              <div className="w-8 h-8 rounded-lg bg-leaf-primary text-white flex items-center justify-center font-bold">🌿</div>
+              <span className="font-bold text-lg">Leaf<span className="text-leaf-primary">Book</span></span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setScreen('3')} className="relative p-2 text-gray-600">
+                🛒 {cart.length > 0 && <span className="absolute top-0 right-0 bg-leaf-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{cart.length}</span>}
+              </button>
+              <button onClick={() => setScreen('7')} className="w-8 h-8 rounded-full bg-emerald-100 text-leaf-primary font-bold flex items-center justify-center text-xs">👤</button>
+            </div>
+          </header>
+
+
+          {/* Body Content by Screen */}
+          <main className="flex-1 p-4 max-w-4xl mx-auto w-full">
+            {/* Screen 1 */}
+            {screen === '1' && (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-emerald-800 to-green-700 text-white p-6 sm:p-10 rounded-2xl shadow-lg relative overflow-hidden">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight">หนังสือดี ๆ<br/>เริ่มต้นที่นี่</h1>
+                  <p className="text-xs sm:text-sm text-emerald-100 mt-2">E-book คุณภาพ เพื่อการเรียนรู้และพัฒนาตัวเอง</p>
+                  <div className="mt-4 flex bg-white rounded-full p-1 max-w-md">
+                    <input type="text" placeholder="ค้นหาหนังสือ, ชื่อผู้แต่ง..." className="px-4 py-1.5 flex-1 outline-none text-xs text-gray-800 rounded-full" />
+                    <button className="bg-leaf-primary text-white text-xs px-4 py-1.5 rounded-full font-medium">ค้นหา</button>
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="font-bold text-lg mb-3">หนังสือแนะนำ</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {BOOKS.map(b => (
+                      <div key={b.id} className="bg-white p-3 rounded-xl border border-gray-100 shadow-xs flex flex-col justify-between cursor-pointer" onClick={() => setScreen('2')}>
+                        <BookCover type={b.type} title={b.title} author={b.author} />
+                        <div className="mt-2">
+                          <h3 className="text-xs font-semibold text-gray-900 truncate">{b.thaiTitle}</h3>
+                          <div className="text-xs font-bold text-leaf-primary mt-1">฿ {b.price}</div>
+                          <button onClick={(e) => { e.stopPropagation(); setScreen('3'); }} className="mt-2 w-full py-1.5 bg-leaf-primary text-white text-xs rounded-lg font-medium">หยิบใส่ตะกร้า</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Screen 2 */}
+            {screen === '2' && (
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex justify-center max-w-[220px] mx-auto w-full">
+                  <BookCover type="atomic" title="Atomic Habits" author="James Clear" />
+                </div>
+                <div className="space-y-4">
+                  <h1 className="text-xl font-bold text-gray-900">นิสัยเล็กๆ ที่เปลี่ยนชีวิตได้</h1>
+                  <p className="text-xs text-gray-500">James Clear • ⭐ 4.8 (1,245 รีวิว)</p>
+                  <div className="text-2xl font-bold text-leaf-primary">฿ 259</div>
+                  <p className="text-xs text-gray-600">หนังสือที่จะช่วยให้คุณสร้างนิสัยที่ดีทีละเล็กทีละน้อย เพื่อชีวิตที่ดีขึ้นในระยะยาว</p>
+                  <div className="border-y border-gray-100 py-3 text-xs space-y-1.5 text-gray-600">
+                    <div>🏷️ ประเภท: พัฒนาตนเอง</div>
+                    <div>📄 จำนวนหน้า: 320 หน้า</div>
+                    <div>💾 รูปแบบ: PDF</div>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button onClick={() => setScreen('3')} className="flex-1 py-2.5 border-2 border-leaf-primary text-leaf-primary rounded-xl text-xs font-semibold">หยิบใส่ตะกร้า</button>
+                    <button onClick={() => setScreen('3')} className="flex-1 py-2.5 bg-leaf-primary text-white rounded-xl text-xs font-semibold shadow-xs">ซื้อเลย</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Screen 3 */}
+            {screen === '3' && (
+              <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-5">
+                <div className="flex justify-between text-xs font-semibold text-center border-b pb-3">
+                  <span className="text-leaf-primary">1. ตะกร้า</span>
+                  <span className="text-gray-400">2. ข้อมูลผู้ซื้อ</span>
+                  <span className="text-gray-400">3. ยืนยัน</span>
+                </div>
+                <h2 className="font-bold text-sm">รายการสั่งซื้อ</h2>
+                <div className="flex items-center gap-3 py-2 border-b">
+                  <div className="w-12 h-16"><BookCover type="atomic" title="Atomic Habits" author="James Clear" /></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold truncate">นิสัยเล็กๆ ที่เปลี่ยนชีวิตได้</div>
+                    <div className="text-xs text-leaf-primary font-bold">฿ 259</div>
+                    <div className="text-[10px] text-gray-400">จำนวน : 1</div>
+                  </div>
+                  <div className="text-xs font-bold">฿ 259</div>
+                </div>
+                <div className="flex justify-between font-bold text-sm"><span>รวมทั้งหมด</span><span className="text-leaf-primary">฿ 259</span></div>
+                <div className="space-y-3 pt-2">
+                  <h3 className="text-xs font-bold text-gray-700">ข้อมูลผู้ซื้อ</h3>
+                  <input type="text" defaultValue="สมชาย ใจดี" className="w-full text-xs p-2.5 bg-gray-50 border rounded-xl" />
+                  <input type="email" defaultValue="you@example.com" className="w-full text-xs p-2.5 bg-gray-50 border rounded-xl" />
+                  <button onClick={() => setScreen('4')} className="w-full py-3 bg-leaf-primary text-white rounded-xl text-xs font-bold shadow-md">ไปยังการชำระเงิน</button>
+                </div>
+              </div>
+            )}
+
+            {/* Screen 4 */}
+            {screen === '4' && (
+              <div className="max-w-sm mx-auto bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-5">
+                <h1 className="text-center font-bold text-base">ชำระเงิน (Mock Payment)</h1>
+                <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900">
+                  <div className="font-bold">DEMO ONLY</div>
+                  <div>การจำลองการชำระเงินเท่านั้น ไม่ใช่การรับเงินจริง</div>
+                </div>
+                <div className="space-y-2 border-y py-3 text-xs">
+                  <div className="flex justify-between"><span>เลขที่คำสั่งซื้อ:</span><span className="font-bold font-mono">#ORD2026001</span></div>
+                  <div className="flex justify-between font-bold"><span>ยอดที่ต้องชำระ:</span><span className="text-leaf-primary text-sm">฿ 259</span></div>
+                </div>
+                <button onClick={() => setScreen('5')} className="w-full py-3 bg-leaf-primary text-white rounded-xl text-xs font-bold">💳 จำลองชำระเงินสำเร็จ</button>
+                <button onClick={() => setScreen('1')} className="w-full text-center text-xs text-gray-400">ยกเลิก</button>
+              </div>
+            )}
+
+            {/* Screen 5 */}
+            {screen === '5' && (
+              <div className="max-w-sm mx-auto bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-5 text-center">
+                <div className="w-16 h-16 bg-emerald-100 text-leaf-primary rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
+                <div>
+                  <h1 className="font-bold text-lg text-gray-900">ชำระเงินสำเร็จ!</h1>
+                  <p className="text-xs text-gray-500">คำสั่งซื้อของคุณได้รับการยืนยันแล้ว</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl text-xs space-y-2 text-left">
+                  <div className="flex justify-between"><span>เลขที่คำสั่งซื้อ</span><span className="font-mono font-bold">#ORD2026001</span></div>
+                  <div className="flex justify-between"><span>ยอดที่ชำระ</span><span className="font-bold text-leaf-primary">฿ 259</span></div>
+                  <div className="flex justify-between"><span>วันที่สั่งซื้อ</span><span>10 ก.ย. 2026 14:32</span></div>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-[11px] text-emerald-900 text-left">
+                  ✉️ เราได้ส่งอีเมลยืนยันคำสั่งซื้อ พร้อมลิงก์ดาวน์โหลดไปยังอีเมลของคุณแล้ว
+                </div>
+                <button onClick={() => setScreen('1')} className="w-full py-2.5 bg-leaf-primary text-white rounded-xl text-xs font-bold">กลับไปหน้าร้าน</button>
+              </div>
+            )}
+
+            {/* Screen 6 */}
+            {screen === '6' && (
+              <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-5">
+                <h1 className="font-bold text-lg">ติดตามสถานะคำสั่งซื้อ</h1>
+                <div className="space-y-3">
+                  <input type="text" defaultValue="#ORD2026001" className="w-full text-xs p-2.5 bg-gray-50 border rounded-xl" />
+                  <input type="email" defaultValue="you@example.com" className="w-full text-xs p-2.5 bg-gray-50 border rounded-xl" />
+                  <button className="w-full py-2.5 bg-leaf-primary text-white rounded-xl text-xs font-bold">ค้นหา</button>
+                </div>
+                <div className="border-t pt-4 space-y-4">
+                  <div className="font-mono text-xs font-bold">คำสั่งซื้อ #ORD2026001</div>
+                  <div className="flex justify-between text-[10px] text-center font-bold">
+                    <div className="text-emerald-700">✓ PENDING<br/><span className="text-gray-400 font-normal">รอชำระเงิน</span></div>
+                    <div className="text-emerald-700">✓ PAID<br/><span className="text-gray-400 font-normal">ชำระเงินสำเร็จ</span></div>
+                    <div className="text-emerald-700">✓ จัดส่งลิงก์<br/><span className="text-gray-400 font-normal">ส่งลิงก์ดาวน์โหลด</span></div>
+                    <div className="text-emerald-700">✓ เสร็จสิ้น<br/><span className="text-gray-400 font-normal">เรียบร้อย</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Screen 7 */}
+            {screen === '7' && (
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs max-w-xl mx-auto space-y-6">
+                <div className="flex items-center gap-4 border-b pb-4">
+                  <div className="w-16 h-16 bg-emerald-100 text-leaf-primary rounded-full flex items-center justify-center text-2xl">🌿</div>
+                  <div>
+                    <h2 className="font-bold text-base">สมชาย ใจดี</h2>
+                    <p className="text-xs text-gray-400">you@example.com</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-xs">
+                  <div className="font-bold text-sm">ข้อมูลส่วนตัว</div>
+                  <div><span className="text-gray-400">ชื่อ - นามสกุล:</span> <span className="font-medium">สมชาย ใจดี</span></div>
+                  <div><span className="text-gray-400">อีเมล:</span> <span className="font-medium">you@example.com</span></div>
+                  <div><span className="text-gray-400">เบอร์โทรศัพท์:</span> <span className="font-medium">081-234-5678</span></div>
+                </div>
+              </div>
+            )}
+
+            {/* Screen 8 */}
+            {screen === '8' && (
+              <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-4">
+                <h1 className="font-bold text-lg">ประวัติคำสั่งซื้อ</h1>
+                {[
+                  { id: 'ORD2026001', date: '10 ก.ย. 2026 14:32', price: 259, status: 'PAID', type: 'atomic' },
+                  { id: 'ORD2026002', date: '5 ก.ย. 2026 10:15', price: 198, status: 'PENDING', type: 'mountain' },
+                  { id: 'ORD2026003', date: '1 ก.ย. 2026 16:20', price: 219, status: 'PAID', type: 'stars' }
+                ].map(o => (
+                  <div key={o.id} className="border p-3 rounded-xl flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-14"><BookCover type={o.type} /></div>
+                      <div>
+                        <div className="font-mono font-bold">#{o.id} <span className={`px-2 py-0.5 rounded-full text-[10px] ${o.status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>{o.status}</span></div>
+                        <div className="text-[10px] text-gray-400">{o.date}</div>
+                        <div className="font-bold text-leaf-primary mt-0.5">฿ {o.price}</div>
+                      </div>
+                    </div>
+                    <button className="px-3 py-1 bg-leaf-primary text-white text-[11px] rounded-lg">ดูรายละเอียด</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Screen 9: Mobile App Simulator */}
+            {screen === '9' && (
+              <div className="flex justify-center py-4">
+                <div className="w-[340px] h-[680px] bg-black rounded-[40px] p-3 shadow-2xl border-4 border-slate-800 flex flex-col overflow-hidden relative text-slate-800">
+                  <div className="bg-white px-4 py-1 text-[10px] flex justify-between font-bold"><span>11:20</span><span>📶 🔋</span></div>
+                  <div className="flex-1 bg-[#fbfdfc] overflow-y-auto p-3 space-y-4 pb-14 text-xs">
+                    <div className="font-bold text-sm text-leaf-primary">🌿 LeafBook</div>
+                    <div className="bg-emerald-800 text-white p-4 rounded-xl">
+                      <div className="font-bold">หนังสือดี ๆ เริ่มต้นที่นี่</div>
+                    </div>
+                    <div className="font-bold">หนังสือแนะนำ</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <BookCover type="mountain" title="Mountain" author="Alex" />
+                      <BookCover type="atomic" title="Atomic" author="James" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 bg-white border-t p-2 flex justify-around text-[10px] font-medium text-gray-600">
+                    <span className="text-leaf-primary font-bold">🏠 หน้าร้าน</span>
+                    <span>🛒 ตะกร้า</span>
+                    <span>👤 โปรไฟล์</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
