@@ -3,6 +3,29 @@ import { INITIAL_BOOKS, INITIAL_ORDERS, INITIAL_USER } from '../data/initialData
 
 const StoreContext = createContext();
 
+// Safe storage wrapper to prevent crashes in restricted WebViews or private browsing
+const safeStorage = {
+  getItem: (key) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn('Storage read warning:', e);
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {
+      console.warn('Storage write warning:', e);
+    }
+  }
+};
+
 export function StoreProvider({ children }) {
   // Books catalog
   const [books] = useState(INITIAL_BOOKS);
@@ -13,7 +36,7 @@ export function StoreProvider({ children }) {
 
   // Cart state
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('leafbook_cart');
+    const saved = safeStorage.getItem('leafbook_cart');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { }
     }
@@ -22,7 +45,7 @@ export function StoreProvider({ children }) {
 
   // Orders state
   const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('leafbook_orders');
+    const saved = safeStorage.getItem('leafbook_orders');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { }
     }
@@ -31,7 +54,7 @@ export function StoreProvider({ children }) {
 
   // User profile
   const [userProfile, setUserProfile] = useState(() => {
-    const saved = localStorage.getItem('leafbook_user');
+    const saved = safeStorage.getItem('leafbook_user');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { }
     }
@@ -58,7 +81,7 @@ export function StoreProvider({ children }) {
 
   // Resend API Key Management
   const [resendApiKey, setResendApiKey] = useState(() => {
-    return localStorage.getItem('leafbook_resend_key') || '';
+    return safeStorage.getItem('leafbook_resend_key') || '';
   });
 
   // Resend Settings Modal Toggle
@@ -75,7 +98,7 @@ export function StoreProvider({ children }) {
 
   // Persist sent emails log for assignment verification
   const [sentEmails, setSentEmails] = useState(() => {
-    const saved = localStorage.getItem('leafbook_sent_emails');
+    const saved = safeStorage.getItem('leafbook_sent_emails');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { }
     }
@@ -93,26 +116,26 @@ export function StoreProvider({ children }) {
     ];
   });
 
-  // Persist to localStorage
+  // Persist to safeStorage
   useEffect(() => {
-    localStorage.setItem('leafbook_cart', JSON.stringify(cart));
+    safeStorage.setItem('leafbook_cart', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem('leafbook_orders', JSON.stringify(orders));
+    safeStorage.setItem('leafbook_orders', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('leafbook_user', JSON.stringify(userProfile));
+    safeStorage.setItem('leafbook_user', JSON.stringify(userProfile));
   }, [userProfile]);
 
   useEffect(() => {
-    localStorage.setItem('leafbook_sent_emails', JSON.stringify(sentEmails));
+    safeStorage.setItem('leafbook_sent_emails', JSON.stringify(sentEmails));
   }, [sentEmails]);
 
   useEffect(() => {
     if (resendApiKey) {
-      localStorage.setItem('leafbook_resend_key', resendApiKey);
+      safeStorage.setItem('leafbook_resend_key', resendApiKey);
     }
   }, [resendApiKey]);
 
@@ -211,7 +234,7 @@ export function StoreProvider({ children }) {
       sentTo: recipientEmail
     });
 
-    const key = customKey || resendApiKey || localStorage.getItem('leafbook_resend_key');
+    const key = customKey || resendApiKey || safeStorage.getItem('leafbook_resend_key');
 
     try {
       const payload = {
